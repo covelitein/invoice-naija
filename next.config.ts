@@ -9,6 +9,14 @@ const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
     agentFeedback: true,
+    serverActions: {
+      allowedOrigins: [
+        "invoice-9ja.vercel.app",
+        "localhost:3000",
+        "127.0.0.1:3000",
+        "*.vercel.app",
+      ],
+    },
   },
   cacheComponents: true,
   partialPrefetching: true,

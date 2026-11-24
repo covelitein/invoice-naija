@@ -1,5 +1,6 @@
 "use client";
 
+import { authClient } from "@/lib/auth/client";
 import { Button } from "@heroui/react";
 import { useState } from "react";
 
@@ -27,7 +28,24 @@ function GoogleMark() {
 }
 
 export function GoogleButton() {
-  const [notice, setNotice] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/home",
+      });
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Failed to sign in with Google.";
+      setError(message);
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="grid gap-2">
@@ -36,15 +54,15 @@ export function GoogleButton() {
         variant="outline"
         fullWidth
         className="auth-button"
-        onPress={() => setNotice(true)}
+        isDisabled={loading}
+        onPress={handleGoogleSignIn}
       >
         <GoogleMark />
-        Continue with Google
+        {loading ? "Connecting to Google…" : "Continue with Google"}
       </Button>
-      {notice ? (
-        <p className="text-center text-xs text-muted">
-          Google sign-in ships with the backend. Use email to continue in local
-          demo mode.
+      {error ? (
+        <p className="rounded-2xl border border-[color-mix(in_oklab,var(--danger)_25%,var(--border))] bg-[color-mix(in_oklab,var(--danger)_8%,white)] px-4 py-2 text-center text-xs text-[color-mix(in_oklab,var(--danger)_75%,black)]">
+          {error}
         </p>
       ) : null}
     </div>
